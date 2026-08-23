@@ -15,6 +15,9 @@ func Retry(ctx context.Context, attempts int, operation func() error) error {
 		if last == nil {
 			return last
 		}
+		if Classify(last) == KindMissing {
+			return last
+		}
 	}
 	return last
 }

@@ -1,5 +1,7 @@
 package lookupfail
 
+import "errors"
+
 type Kind string
 
 const (
@@ -8,7 +10,7 @@ const (
 )
 
 func Classify(err error) Kind {
-	if err == ErrStreamMissing {
+	if errors.Is(err, ErrStreamMissing) {
 		return KindMissing
 	}
 	return KindSystem

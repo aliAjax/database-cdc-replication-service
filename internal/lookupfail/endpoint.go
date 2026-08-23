@@ -3,6 +3,10 @@ package lookupfail
 import "net/http"
 
 func StatusFor(err error) int {
-	_ = err
-	return http.StatusInternalServerError
+	switch Classify(err) {
+	case KindMissing:
+		return http.StatusNotFound
+	default:
+		return http.StatusInternalServerError
+	}
 }

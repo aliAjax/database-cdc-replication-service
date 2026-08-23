@@ -14,7 +14,7 @@ func NewRepository(streams map[string]string) *Repository { return &Repository{s
 func (r *Repository) Load(id string) (string, error) {
 	value, ok := r.streams[id]
 	if !ok {
-		return "", fmt.Errorf("load stream %q: %v", id, ErrStreamMissing)
+		return "", fmt.Errorf("load stream %q: %w", id, ErrStreamMissing)
 	}
 	return value, nil
 }
