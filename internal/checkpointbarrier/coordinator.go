@@ -1,29 +1,34 @@
 package checkpointbarrier
 
-import "context"
+import (
+	"context"
+	"sync"
+)
 
 type Coordinator struct{}
 
 func (Coordinator) CommitAll(ctx context.Context, commits []func(context.Context) error) []error {
-	barrier := New()
-	if len(commits) > 0 {
-		barrier.Add(len(commits) - 1)
-	}
 	errs := make(chan error, len(commits))
-	for index, commit := range commits {
-		index, commit := index, commit
+	var group sync.WaitGroup
+	group.Add(len(commits))
+	for _, commit := range commits {
+		commit := commit
 		go func() {
-			if index < len(commits)-1 {
-				defer barrier.Done()
-			}
+			defer group.Done()
 			if err := commit(ctx); err != nil {
-				errs <- err
+				select {
+				case errs <- err:
+				case <-ctx.Done():
+				}
 			}
 		}()
 	}
-	_ = barrier.Wait(ctx)
+	// close(errs) happens strictly after every commit goroutine has stopped
+	// writing to errs, so there is no "send on closed channel" panic and no
+	// late error is dropped (which would cause a premature success).
+	group.Wait()
 	close(errs)
-	out := make([]error, 0, len(errs))
+	out := make([]error, 0, len(commits))
 	for err := range errs {
 		out = append(out, err)
 	}

@@ -8,10 +8,17 @@ type Update struct {
 }
 
 func Collect(ctx context.Context, input <-chan Update, publisher *Publisher) error {
-	for update := range input {
-		if err := publisher.Publish(context.Background(), update.PipelineID, update.Position); err != nil {
-			return err
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case update, ok := <-input:
+			if !ok {
+				return nil
+			}
+			if err := publisher.Publish(ctx, update.PipelineID, update.Position); err != nil {
+				return err
+			}
 		}
 	}
-	return nil
 }

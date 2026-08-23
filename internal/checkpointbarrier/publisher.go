@@ -17,6 +17,13 @@ func (p *Publisher) Publish(ctx context.Context, pipelineID string, position uin
 		return err
 	}
 	p.mu.Lock()
+	// Checkpoints must only move forward. Shards commit concurrently and may
+	// arrive out of order; an older position must never overwrite a newer one,
+	// otherwise the recorded checkpoint regresses.
+	if position < p.positions[pipelineID] {
+		p.mu.Unlock()
+		return nil
+	}
 	p.positions[pipelineID] = position
 	p.mu.Unlock()
 	return nil
