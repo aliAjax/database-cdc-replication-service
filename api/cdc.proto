@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package cdc.v1;
+
+service Capture { rpc Read(ReadRequest) returns (stream ChangeEvent); }
+service Snapshot { rpc Plan(PlanRequest) returns (PlanResponse); }
+service Sink { rpc ApplyBatch(BatchRequest) returns (BatchResponse); }
+service Checkpoint { rpc Commit(CheckpointRequest) returns (CheckpointResponse); }
+
+message ReadRequest { string source_id = 1; string position = 2; }
+message PlanRequest { string source_id = 1; }
+message PlanResponse { repeated string tables = 1; }
+message ChangeEvent { string id = 1; string operation = 2; bytes payload = 3; }
+message BatchRequest { repeated ChangeEvent events = 1; }
+message BatchResponse { int32 applied = 1; }
+message CheckpointRequest { string pipeline_id = 1; string position = 2; }
+message CheckpointResponse { bool committed = 1; }
