@@ -8,7 +8,7 @@ type Manifest struct {
 }
 
 func cloneManifest(manifest Manifest) Manifest {
-	manifest.Tables = manifest.Tables
+	manifest.Tables = append([]string(nil), manifest.Tables...)
 	return manifest
 }
 

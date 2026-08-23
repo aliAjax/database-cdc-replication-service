@@ -21,5 +21,8 @@ func (c *Cache) Load(id string) (Manifest, bool) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	manifest, ok := c.items[id]
-	return manifest, ok
+	if !ok {
+		return Manifest{}, false
+	}
+	return cloneManifest(manifest), true
 }
