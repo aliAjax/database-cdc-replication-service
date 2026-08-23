@@ -1,6 +1,9 @@
 package requestscope
 
-import "context"
+import (
+	"context"
+	"errors"
+)
 
 type Worker struct {
 	Step func(context.Context, int) error
@@ -9,9 +12,15 @@ type Worker struct {
 func (w Worker) Retry(ctx context.Context, attempts int) error {
 	var last error
 	for attempt := 1; attempt <= attempts; attempt++ {
-		last = w.Step(context.Background(), attempt)
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		last = w.Step(ctx, attempt)
 		if last == nil {
 			return nil
+		}
+		if errors.Is(last, context.Canceled) || errors.Is(last, context.DeadlineExceeded) {
+			return last
 		}
 	}
 	return last

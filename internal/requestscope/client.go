@@ -7,6 +7,5 @@ type Client struct {
 }
 
 func (c Client) Probe(ctx context.Context, sourceID string) error {
-	_ = ctx
-	return c.Fetch(context.Background(), sourceID)
+	return c.Fetch(ctx, sourceID)
 }
