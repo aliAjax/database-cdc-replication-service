@@ -26,15 +26,18 @@ func (r *Resumer) Resume(ctx context.Context, token string) (Cursor, error) {
 	if err != nil {
 		return Cursor{}, err
 	}
+	if r.store == nil {
+		return Cursor{}, ErrCheckpointStoreUnavailable
+	}
 	current, err := r.store.Load(ctx, next.Stream)
 	if err != nil {
-		return Cursor{}, fmt.Errorf("load checkpoint: %v", err)
+		return Cursor{}, fmt.Errorf("load checkpoint: %w", err)
 	}
 	if err := ValidateAdvance(current, next); err != nil {
 		return Cursor{}, err
 	}
 	if err := r.store.Save(ctx, next); err != nil {
-		return Cursor{}, fmt.Errorf("save checkpoint: %v", err)
+		return Cursor{}, fmt.Errorf("save checkpoint: %w", err)
 	}
 	return next, nil
 }

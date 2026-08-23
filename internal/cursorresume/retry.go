@@ -2,6 +2,7 @@ package cursorresume
 
 import (
 	"context"
+	"errors"
 )
 
 func ResumeWithRetry(ctx context.Context, attempts int, resume func(context.Context) error) error {
@@ -17,7 +18,7 @@ func ResumeWithRetry(ctx context.Context, attempts int, resume func(context.Cont
 		if last == nil {
 			return nil
 		}
-		if last == ErrInvalidCursor {
+		if errors.Is(last, ErrInvalidCursor) {
 			return last
 		}
 	}

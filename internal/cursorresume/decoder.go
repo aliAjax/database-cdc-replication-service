@@ -26,11 +26,11 @@ func EncodeCursor(cursor Cursor) (string, error) {
 func DecodeCursor(token string) (Cursor, error) {
 	payload, err := base64.RawURLEncoding.DecodeString(token)
 	if err != nil {
-		return Cursor{}, fmt.Errorf("%v: decode token: %v", ErrInvalidCursor, err)
+		return Cursor{}, fmt.Errorf("%w: decode token: %v", ErrInvalidCursor, err)
 	}
 	var cursor Cursor
 	if err := json.Unmarshal(payload, &cursor); err != nil {
-		return Cursor{}, fmt.Errorf("%v: decode payload: %v", ErrInvalidCursor, err)
+		return Cursor{}, fmt.Errorf("%w: decode payload: %v", ErrInvalidCursor, err)
 	}
 	if cursor.Stream == "" {
 		return Cursor{}, fmt.Errorf("%w: stream is required", ErrInvalidCursor)
