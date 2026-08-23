@@ -12,11 +12,10 @@ func NewMachine(initial State) *Machine { return &Machine{state: initial} }
 func (m *Machine) Move(next State) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	current := m.state
-	m.state = next
-	if err := Transition(current, next); err != nil {
+	if err := Transition(m.state, next); err != nil {
 		return err
 	}
+	m.state = next
 	return nil
 }
 

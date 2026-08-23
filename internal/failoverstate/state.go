@@ -14,8 +14,8 @@ const (
 func Transition(current, next State) error {
 	allowed := map[State]map[State]bool{
 		StateStreaming:  {StateDegraded: true, StateFailed: true},
-		StateDegraded:   {StateFailed: true},
-		StateRecovering: {StateFailed: true},
+		StateDegraded:   {StateRecovering: true, StateFailed: true},
+		StateRecovering: {StateStreaming: true, StateFailed: true},
 		StateFailed:     {},
 	}
 	if !allowed[current][next] {

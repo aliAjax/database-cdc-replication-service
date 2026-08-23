@@ -15,5 +15,8 @@ func (w Worker) Run(ctx context.Context) error {
 		_ = w.Machine.Move(StateFailed)
 		return err
 	}
+	if err := w.Machine.Move(StateStreaming); err != nil {
+		return err
+	}
 	return nil
 }
