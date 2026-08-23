@@ -1,0 +1,15 @@
+openapi: 3.0.3
+info:
+  title: CDC Replication API
+  version: 1.0.0
+paths:
+  /healthz:
+    get:
+      responses:
+        '200': {description: healthy}
+  /api/v1/sources:
+    post: {responses: {'201': {description: created}}}
+    get: {responses: {'200': {description: list}}}
+  /api/v1/pipelines:
+    post: {responses: {'201': {description: created}}}
+    get: {responses: {'200': {description: list}}}
